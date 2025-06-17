@@ -1,116 +1,275 @@
-<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Resolución de Desigualdades</title>
+  <title>Resolver Desigualdades</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: #f0f8ff;
-      padding: 30px;
+      background-color: #f4f4f4;
+      padding: 20px;
     }
-    input, select, button {
+    .container {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px #ccc;
+      max-width: 600px;
+      margin: auto;
+    }
+    input, button {
       padding: 10px;
-      margin: 10px 0;
+      font-size: 16px;
+      margin-top: 10px;
       width: 100%;
     }
-    .resultado {
-      background-color: #e6ffe6;
-      padding: 15px;
-      border: 1px solid #ccc;
+    #resultado {
       margin-top: 20px;
+      padding: 10px;
+      background-color: #e3fcec;
+      border: 1px solid #b3e6c0;
+      border-radius: 5px;
     }
   </style>
 </head>
 <body>
-
-<h2>Calculadora de Desigualdades Lineales y Cuadráticas</h2>
-
-<form id="formulario">
-  <label for="tipo">Tipo de desigualdad:</label>
-  <select id="tipo">
-    <option value="lineal">Lineal (ax + b < 0)</option>
-    <option value="cuadratica">Cuadrática (ax² + bx + c < 0)</option>
-  </select>
-
-  <label>Coeficiente a:</label>
-  <input type="number" id="a" required step="any">
-
-  <label>Coeficiente b:</label>
-  <input type="number" id="b" required step="any">
-
-  <div id="campoC" style="display: none;">
-    <label>Coeficiente c:</label>
-    <input type="number" id="c" step="any">
+  <div class="container">
+    <h2>Resolución de Desigualdades Lineales y Cuadráticas</h2>
+    <p>Escribe una desigualdad como: <br> <strong>2*x^2 + 3*x - 5 &lt; 0</strong> o <strong>x + 4 &gt; 7</strong></p>
+    <input type="text" id="desigualdad" placeholder="Ejemplo: x^2 - 4 < 0">
+    <button onclick="resolverDesigualdad()">Resolver</button>
+    <div id="resultado"></div>
   </div>
 
-  <label>Desigualdad:</label>
-  <select id="desigualdad">
-    <option value="<">&lt;</option>
-    <option value="<=">&le;</option>
-    <option value=">">&gt;</option>
-    <option value=">=">&ge;</option>
-  </select>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/12.4.1/math.js"></script>
+  <script>
+    function resolverDesigualdad() {
+      const input = document.getElementById("desigualdad").value;
+      const resultado = document.getElementById("resultado");
+      try {
+        // Separar lados y operador
+        const operadores = ["<=", ">=", "<", ">"];
+        let operador = operadores.find(op => input.includes(op));
+        if (!operador) throw "Operador no válido";
 
-  <button type="button" onclick="resolver()">Resolver</button>
-</form>
+        const partes = input.split(operador);
+        const izquierda = math.simplify(partes[0]).toString();
+        const derecha = math.simplify(partes[1]).toString();
 
-<div id="resultado" class="resultado"></div>
+        // Creamos la función de comparación
+        const expr = (${izquierda}) - (${derecha});
 
-<script>
-  document.getElementById("tipo").addEventListener("change", function() {
-    const tipo = this.value;
-    document.getElementById("campoC").style.display = tipo === "cuadratica" ? "block" : "none";
-  });
+        // Convertimos a función polinómica
+        const polinomio = math.simplify(expr);
+        const coef = math.polyCoefficients(polinomio);
 
-  function resolver() {
-    const tipo = document.getElementById("tipo").value;
-    const a = parseFloat(document.getElementById("a").value);
-    const b = parseFloat(document.getElementById("b").value);
-    const desigualdad = document.getElementById("desigualdad").value;
-    const resultado = document.getElementById("resultado");
-
-    resultado.innerHTML = "";
-
-    if (tipo === "lineal") {
-      const x = -b / a;
-      let respuesta = `Solución: x ${desigualdad} ${x.toFixed(2)}`;
-      resultado.innerHTML = respuesta;
-    } else {
-      const c = parseFloat(document.getElementById("c").value);
-      const discriminante = b ** 2 - 4 * a * c;
-
-      if (discriminante < 0) {
-        resultado.innerHTML = "No hay soluciones reales.";
-      } else {
-        const x1 = (-b + Math.sqrt(discriminante)) / (2 * a);
-        const x2 = (-b - Math.sqrt(discriminante)) / (2 * a);
-        const menor = Math.min(x1, x2);
-        const mayor = Math.max(x1, x2);
-
-        let solucion = "";
-        if (a > 0) {
-          if (desigualdad === "<") {
-            solucion = `x ∈ (${menor.toFixed(2)}, ${mayor.toFixed(2)})`;
-          } else if (desigualdad === "<=") {
-            solucion = `x ∈ [${menor.toFixed(2)}, ${mayor.toFixed(2)}]`;
-          } else {
-            solucion = `x ∈ (-∞, ${menor.toFixed(2)}) ∪ (${mayor.toFixed(2)}, ∞)`;
-          }
-        } else {
-          if (desigualdad === "<") {
-            solucion = `x ∈ (-∞, ${menor.toFixed(2)}) ∪ (${mayor.toFixed(2)}, ∞)`;
-          } else if (desigualdad === "<=") {
-            solucion = `x ∈ (-∞, ${menor.toFixed(2)}] ∪ [${mayor.toFixed(2)}, ∞)`;
-          } else {
-            solucion = `x ∈ [${menor.toFixed(2)}, ${mayor.toFixed(2)}]`;
+        let soluciones = [];
+        if (coef.length === 2) {
+          // Lineal: ax + b
+          const a = coef[0], b = coef[1];
+          const x = -b / a;
+          soluciones.push(x);
+        } else if (coef.length === 3) {
+          // Cuadrática: ax^2 + bx + c
+          const [a, b, c] = coef;
+          const disc = b ** 2 - 4 * a * c;
+          if (disc >= 0) {
+            const x1 = (-b - Math.sqrt(disc)) / (2 * a);
+            const x2 = (-b + Math.sqrt(disc)) / (2 * a);
+            soluciones.push(x1, x2);
           }
         }
-        resultado.innerHTML = `Solución por intervalos:<br><strong>${solucion}</strong>`;
+
+        soluciones.sort((a, b) => a - b);
+
+        let textoSol = Raíces encontradas: ${soluciones.length > 0 ? soluciones.join(", ") : "ninguna"};
+
+        // Intervalos de prueba (solo para 1 o 2 raíces)
+        if (soluciones.length > 0) {
+          let pruebas = [];
+          const testPoints = [];
+
+          if (soluciones.length === 1) {
+            testPoints.push(soluciones[0] - 1, soluciones[0] + 1);
+          } else {
+            testPoints.push(soluciones[0] - 1, (soluciones[0] + soluciones[1]) / 2, soluciones[1] + 1);
+          }
+
+          testPoints.forEach(tp => {
+            const valor = math.evaluate(polinomio.toString(), { x: tp });
+            const cumple = eval(${valor} ${operador} 0);
+            pruebas.push(${cumple ? "✔️" : "❌"} x = ${tp.toFixed(2)} → ${valor.toFixed(2)} ${operador} 0);
+          });
+
+          textoSol += "<br><br><strong>Pruebas de Intervalo:</strong><br>" + pruebas.join("<br>");
+        }
+
+        resultado.innerHTML = textoSol;
+      } catch (err) {
+        resultado.innerHTML = <span style="color:red;">Error: ${err}</span>;
       }
     }
-  }
-</script>
+  </script>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Resolver Desigualdades con Gráfico</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      padding: 20px;
+    }
+    .container {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px #ccc;
+      max-width: 800px;
+      margin: auto;
+    }
+    input, button {
+      padding: 10px;
+      font-size: 16px;
+      margin-top: 10px;
+      width: 100%;
+    }
+    #resultado {
+      margin-top: 20px;
+      padding: 10px;
+      background-color: #e3fcec;
+      border: 1px solid #b3e6c0;
+      border-radius: 5px;
+    }
+    canvas {
+      margin-top: 30px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Resolver desigualdades lineales o cuadráticas con gráfico</h2>
+    <p>Escribe una desigualdad como: <strong>x^2 - 4 &lt; 0</strong> o <strong>2*x + 5 &gt; 3</strong></p>
+    <input type="text" id="desigualdad" placeholder="Ejemplo: x^2 - 4 < 0">
+    <button onclick="resolverDesigualdad()">Resolver y Graficar</button>
+    <div id="resultado"></div>
+    <canvas id="grafico" width="700" height="400"></canvas>
+  </div>
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/12.4.1/math.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    let chart;
+
+    function resolverDesigualdad() {
+      const input = document.getElementById("desigualdad").value;
+      const resultado = document.getElementById("resultado");
+      const operadores = ["<=", ">=", "<", ">"];
+      const operador = operadores.find(op => input.includes(op));
+      if (!operador) {
+        resultado.innerHTML = "<span style='color:red;'>❌ Error: operador no válido</span>";
+        return;
+      }
+
+      const [lhs, rhs] = input.split(operador);
+      const izquierda = math.simplify(lhs);
+      const derecha = math.simplify(rhs);
+      const expr = math.simplify((${izquierda}) - (${derecha}));
+      const exprStr = expr.toString();
+
+      // Obtener coeficientes para identificar si es lineal o cuadrática
+      const coef = math.polyCoefficients(expr);
+
+      // Encontrar raíces si existen
+      let soluciones = [];
+      if (coef.length === 2) {
+        const [a, b] = coef;
+        soluciones.push(-b / a);
+      } else if (coef.length === 3) {
+        const [a, b, c] = coef;
+        const disc = b**2 - 4*a*c;
+        if (disc >= 0) {
+          soluciones.push((-b - Math.sqrt(disc)) / (2 * a));
+          soluciones.push((-b + Math.sqrt(disc)) / (2 * a));
+        }
+      }
+      soluciones.sort((a, b) => a - b);
+
+      // Texto del resultado
+      let texto = Función equivalente: <strong>f(x) = ${exprStr}</strong><br>;
+      texto += Raíces reales: ${soluciones.length > 0 ? soluciones.join(", ") : "ninguna"}<br><br>;
+
+      // Probar intervalos
+      const puntosPrueba = [];
+      if (soluciones.length === 0) {
+        puntosPrueba.push(0);
+      } else if (soluciones.length === 1) {
+        puntosPrueba.push(soluciones[0] - 1, soluciones[0] + 1);
+      } else {
+        const [x1, x2] = soluciones;
+        puntosPrueba.push(x1 - 1, (x1 + x2) / 2, x2 + 1);
+      }
+
+      const evaluaciones = puntosPrueba.map(p => {
+        const valor = math.evaluate(exprStr, {x: p});
+        const cumple = eval(${valor} ${operador} 0);
+        return ${cumple ? "✔️" : "❌"} x = ${p.toFixed(2)} → f(x) = ${valor.toFixed(2)} ${operador} 0;
+      });
+
+      texto += "<strong>Intervalos de prueba:</strong><br>" + evaluaciones.join("<br>");
+      resultado.innerHTML = texto;
+
+      // Graficar
+      const xs = [];
+      const ys = [];
+      for (let x = -10; x <= 10; x += 0.1) {
+        xs.push(x);
+        ys.push(math.evaluate(exprStr, {x}));
+      }
+
+      if (chart) chart.destroy();
+      const ctx = document.getElementById('grafico').getContext('2d');
+      chart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: xs,
+          datasets: [{
+            label: 'f(x) = izquierda - derecha',
+            data: ys,
+            borderColor: 'blue',
+            fill: false,
+            pointRadius: 0,
+            tension: 0.1
+          }, {
+            label: 'y = 0',
+            data: xs.map(() => 0),
+            borderColor: 'gray',
+            borderDash: [5, 5],
+            fill: false,
+            pointRadius: 0
+          }]
+        },
+        options: {
+          scales: {
+            x: {
+              title: { display: true, text: 'x' }
+            },
+            y: {
+              title: { display: true, text: 'f(x)' },
+              min: -10,
+              max: 10
+            }
+          },
+          plugins: {
+            legend: {
+              position: 'top'
+            }
+          }
+        }
+      });
+    }
+  </script>
 </body>
 </html>
