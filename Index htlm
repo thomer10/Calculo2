@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Resolución de Desigualdades</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f0f8ff;
+      padding: 30px;
+    }
+    input, select, button {
+      padding: 10px;
+      margin: 10px 0;
+      width: 100%;
+    }
+    .resultado {
+      background-color: #e6ffe6;
+      padding: 15px;
+      border: 1px solid #ccc;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+
+<h2>Calculadora de Desigualdades Lineales y Cuadráticas</h2>
+
+<form id="formulario">
+  <label for="tipo">Tipo de desigualdad:</label>
+  <select id="tipo">
+    <option value="lineal">Lineal (ax + b < 0)</option>
+    <option value="cuadratica">Cuadrática (ax² + bx + c < 0)</option>
+  </select>
+
+  <label>Coeficiente a:</label>
+  <input type="number" id="a" required step="any">
+
+  <label>Coeficiente b:</label>
+  <input type="number" id="b" required step="any">
+
+  <div id="campoC" style="display: none;">
+    <label>Coeficiente c:</label>
+    <input type="number" id="c" step="any">
+  </div>
+
+  <label>Desigualdad:</label>
+  <select id="desigualdad">
+    <option value="<">&lt;</option>
+    <option value="<=">&le;</option>
+    <option value=">">&gt;</option>
+    <option value=">=">&ge;</option>
+  </select>
+
+  <button type="button" onclick="resolver()">Resolver</button>
+</form>
+
+<div id="resultado" class="resultado"></div>
+
+<script>
+  document.getElementById("tipo").addEventListener("change", function() {
+    const tipo = this.value;
+    document.getElementById("campoC").style.display = tipo === "cuadratica" ? "block" : "none";
+  });
+
+  function resolver() {
+    const tipo = document.getElementById("tipo").value;
+    const a = parseFloat(document.getElementById("a").value);
+    const b = parseFloat(document.getElementById("b").value);
+    const desigualdad = document.getElementById("desigualdad").value;
+    const resultado = document.getElementById("resultado");
+
+    resultado.innerHTML = "";
+
+    if (tipo === "lineal") {
+      const x = -b / a;
+      let respuesta = `Solución: x ${desigualdad} ${x.toFixed(2)}`;
+      resultado.innerHTML = respuesta;
+    } else {
+      const c = parseFloat(document.getElementById("c").value);
+      const discriminante = b ** 2 - 4 * a * c;
+
+      if (discriminante < 0) {
+        resultado.innerHTML = "No hay soluciones reales.";
+      } else {
+        const x1 = (-b + Math.sqrt(discriminante)) / (2 * a);
+        const x2 = (-b - Math.sqrt(discriminante)) / (2 * a);
+        const menor = Math.min(x1, x2);
+        const mayor = Math.max(x1, x2);
+
+        let solucion = "";
+        if (a > 0) {
+          if (desigualdad === "<") {
+            solucion = `x ∈ (${menor.toFixed(2)}, ${mayor.toFixed(2)})`;
+          } else if (desigualdad === "<=") {
+            solucion = `x ∈ [${menor.toFixed(2)}, ${mayor.toFixed(2)}]`;
+          } else {
+            solucion = `x ∈ (-∞, ${menor.toFixed(2)}) ∪ (${mayor.toFixed(2)}, ∞)`;
+          }
+        } else {
+          if (desigualdad === "<") {
+            solucion = `x ∈ (-∞, ${menor.toFixed(2)}) ∪ (${mayor.toFixed(2)}, ∞)`;
+          } else if (desigualdad === "<=") {
+            solucion = `x ∈ (-∞, ${menor.toFixed(2)}] ∪ [${mayor.toFixed(2)}, ∞)`;
+          } else {
+            solucion = `x ∈ [${menor.toFixed(2)}, ${mayor.toFixed(2)}]`;
+          }
+        }
+        resultado.innerHTML = `Solución por intervalos:<br><strong>${solucion}</strong>`;
+      }
+    }
+  }
+</script>
+
+</body>
+</html>
