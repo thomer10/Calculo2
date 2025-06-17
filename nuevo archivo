@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Calculadora de Desigualdades</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      max-width: 600px;
+      margin: auto;
+      padding: 30px;
+      background-color: #f9f9f9;
+      color: #333;
+    }
+
+    h1 {
+      color: #004080;
+    }
+
+    label, select, input {
+      display: block;
+      width: 100%;
+      margin: 10px 0 5px;
+      font-size: 16px;
+    }
+
+    input, select {
+      padding: 8px;
+    }
+
+    button {
+      background-color: #004080;
+      color: white;
+      padding: 10px;
+      width: 100%;
+      border: none;
+      margin-top: 15px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #0059b3;
+    }
+
+    #resultado {
+      margin-top: 20px;
+      b
